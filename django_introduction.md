@@ -173,7 +173,7 @@ def index(request):
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Is it New Year's?</title>
+    <title>Is It Christmas?</title>
   </head>
   <body>
     {% if christmas %}
