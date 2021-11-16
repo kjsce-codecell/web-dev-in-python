@@ -184,3 +184,7 @@ def index(request):
   </body>
 </html>
 ```
+
+# Credits
+
+#### `CS50 Web` - week 3 https://cs50.harvard.edu/web/2020/weeks/3/
