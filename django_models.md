@@ -445,3 +445,7 @@ def flight(request, flight_id):
     <input type="submit">
 </form>
 ```
+
+# Credits
+
+#### `CS50 Web` - week 4 https://cs50.harvard.edu/web/2020/weeks/4/
