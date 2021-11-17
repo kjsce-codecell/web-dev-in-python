@@ -214,12 +214,234 @@ def index(request):
 {% endblock %}
 ```
 
-### Add some flights using the `shell`
+### Add some flights using the shell
+
+```python
+# Import all models
+In [1]: from flights.models import *
+
+# Create some new airports
+In [2]: bom = Airport(code="BOM", city="Mumbai")
+In [3]: delhi = Airport(code="DEL", city="Delhi")
+In [4]: ist = Airport(code="IST", city="Istanbul")
+In [5]: maa = Airport(code="MAA", city="Chennia")
+
+# Save the airports to the database
+In [6]: bom.save()
+In [7]: delhi.save()
+In [8]: ist.save()
+In [9]: maa.save()
+
+# Add a flight and save it to the database
+f = Flight(origin=bom, destination=delhi, duration=218)
+f.save()
+
+# Display some info about the flight
+In [10]: f
+Out[10]: <Flight: 1: Mumbai (BOM) to Delhi (DEL)>
+In [11]: f.origin
+Out[11]: <Airport: Mumbai (BOM)>
+
+# Using the related name to query by airport of arrival:
+In [12]: delhi.arrivals.all()
+Out[12]: <QuerySet [<Flight: 1: Mumbai (BOM) to Delhi (DEL)>]>
+```
 
 ## Django Admin
 
+Django comes with a default admin interface that allows us to do create, read, update and delete our data more easily.
+
+1. We must first create an administrative user
+
+```bash
+python manage.py createsuperuser
+```
+
+2. Now, we must add our models to the admin application by entering the admin.py file within our app
+
+```python
+from django.contrib import admin
+from .models import Flight, Airport
+
+# Register your models here.
+admin.site.register(Flight)
+admin.site.register(Airport)
+```
+
 ## Flight details page
+
+Lets add the ability to click on a flight to get more information about it.
+
+1. To do this, let’s create a URL path that includes the id of a flight:
+
+```python
+path("<int:flight_id>", views.flight, name="flight")
+```
+
+2. `views.py` we will create a `flight` function that takes in a flight id and renders a new html page
+
+```python
+def flight(request, flight_id):
+    flight = Flight.objects.get(id=flight_id)
+    return render(request, "flights/flight.html", {
+        "flight": flight
+    })
+```
+
+3. create a template to display this flight information with a link back to the home pages. `flight.html`
+
+<!-- prettier-ignore -->
+```html
+{% extends "flights/layout.html" %}
+
+{% block body %}
+    <h1>Flight {{ flight.id }}</h1>
+    <ul>
+        <li>Origin: {{ flight.origin }}</li>
+        <li>Destination: {{ flight.destination }}</li>
+        <li>Duration: {{ flight.duration }} minutes</li>
+    </ul>
+    <a href="{% url 'index' %}">All Flights</a>
+{% endblock %}
+```
+
+4. Finally, we need to add the ability to link from one page to another, so we’ll modify our index page to include links. `index.html`
+
+<!-- prettier-ignore -->
+```html
+{% extends "flights/layout.html" %}
+
+{% block body %}
+    <h1>Flights:</h1>
+    <ul>
+        {% for flight in flights %}
+            <li>
+                <a href="{% url 'flight' flight.id %}">
+                    Flight {{ flight.id }}
+                </a>: {{ flight.origin }} to {{ flight.destination }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+```
 
 ## Many-to-Many Relationships
 
-## Users
+1. Lets create a `Passenger` model
+
+```python
+class Passenger(models.Model):
+    name = models.CharField(max_length=64)
+    flights = models.ManyToManyField(Flight, blank=True, related_name="passengers")
+
+    def __str__(self):
+        return f"{self.name}"
+```
+
+- `Passengers` have a **Many to Many** relationship with `flights`, which we describe in Django using the `ManyToManyField`.
+- The first argument in this field is the class of objects that this one is related to.
+- We have provided the argument `blank=True` which means a passenger can have no flights
+- We have added a `related_name` that serves the same purpose as it did earlier: it will allow us to find all passengers on a given flight.
+
+To actually make these changes,
+
+1. we must `makemigrations` and `migrate`.
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+2. We can then register the `Passenger` model in `admin.py`.
+
+```python
+admin.site.register(Passenger)
+```
+
+### Let’s update our flight page so that it displays all passengers on a flight.
+
+1. Visit `views.py` and update our flight view
+
+```python
+def flight(request, flight_id):
+    flight = Flight.objects.get(id=flight_id)
+    passengers = flight.passengers.all()
+    return render(request, "flights/flight.html", {
+        "flight": flight,
+        "passengers": passengers
+    })
+```
+
+2. Add a list of passengers to our `flight.html`
+
+<!-- prettier-ignore -->
+```html
+<h2>Passengers:</h2>
+<ul>
+    {% for passenger in passengers %}
+        <li>{{ passenger }}</li>
+    {% empty %}
+        <li>No Passengers.</li>
+    {% endfor %}
+</ul>
+```
+
+### Let’s work on giving visitors to our site the ability to book a flight.
+
+1. `urls.py`
+
+```python
+path("<int:flight_id>/book", views.book, name="book")
+```
+
+2. `views.py`
+
+```python
+def book(request, flight_id):
+
+    # For a post request, add a new flight
+    if request.method == "POST":
+
+        # Accessing the flight
+        flight = Flight.objects.get(pk=flight_id)
+
+        # Finding the passenger id from the submitted form data
+        passenger_id = int(request.POST["passenger"])
+
+        # Finding the passenger based on the id
+        passenger = Passenger.objects.get(pk=passenger_id)
+
+        # Add passenger to the flight
+        passenger.flights.add(flight)
+
+        # Redirect user to flight page
+        return HttpResponseRedirect(reverse("flight", args=(flight.id,)))
+```
+
+3. we’ll add some context to our flight template so that the page has access to everyone who is not currently a passenger on the flight using Django’s ability to exclude certain objects from a query:
+
+```python
+def flight(request, flight_id):
+    flight = Flight.objects.get(id=flight_id)
+    passengers = flight.passengers.all()
+    non_passengers = Passenger.objects.exclude(flights=flight).all()
+    return render(request, "flights/flight.html", {
+        "flight": flight,
+        "passengers": passengers,
+        "non_passengers": non_passengers
+    })
+```
+
+4. we’ll add a form to our flight page’s HTML using a select input field. `flight.html`
+
+<!-- prettier-ignore -->
+```html
+<form action="{% url 'book' flight.id %}" method="post">
+    {% csrf_token %}
+    <select name="passenger" id="">
+        {% for passenger in non_passengers %}
+            <option value="{{ passenger.id }}">{{ passenger }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit">
+</form>
+```
