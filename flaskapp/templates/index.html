@@ -14,5 +14,13 @@
     {% else %}
         Visitor
     {% endif %}
+
+    {% for nft in nfts %}
+        <div style="margin:10px">
+            <img src="{{nft.image}}" width="40" height="40" />
+            <h2>{{ nft.title }}</h1>
+            <p>{{ nft.cost }}</p>
+        </div>
+    {% endfor %}
 </body>
 </html>
