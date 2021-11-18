@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 
+import datetime
+
 app = Flask(__name__)
 
 test_image_url = "https://media.npr.org/assets/img/2021/03/05/nyancat-still_custom-151b372a60f244f026ea3ca46a3530609e57fceb.png"
@@ -31,7 +33,8 @@ def root():
 @app.route("/hello/")
 @app.route("/hello/<name>")
 def hello(name=None):
-    return render_template("index.html", name=name, nfts=nfts)
+    today = datetime.date.today()
+    return render_template("index.html", name=name, nfts=nfts, date=today)
 
 
 # Handle forms and form submissions
