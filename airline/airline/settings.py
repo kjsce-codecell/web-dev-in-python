@@ -25,7 +25,7 @@ SECRET_KEY = 'lvxv--$077069r^zy7f38jk3h+vyxv&!^8y^b01i&3@e!#0qr8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
