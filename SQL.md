@@ -59,6 +59,9 @@ INSERT INTO flights (origin, destination, duration) VALUES ("Delhi", "Dubai", 32
 ## SELECT
 
 ```sql
+-- Format data
+.mode cloumns
+.headers yes
 -- FROM
 SELECT * FROM flights;
 SELECT origin, destination FROM flights;
@@ -78,7 +81,7 @@ SELECT * FROM flights WHERE duration < 300 OR destination = "Delhi";
 - `MIN`
 - `SUM`
 
-chech out details and more [here](https://www.w3schools.com/sql/sql_count_avg_sum.asp)
+check out details and more [here](https://www.w3schools.com/sql/sql_count_avg_sum.asp)
 
 ## UPDATE
 
@@ -102,7 +105,7 @@ DELETE FROM flights WHERE destination = "Paris";
 - `GROUP BY`: Groups results by a specified column
 - `HAVING`: Allows for additional constraints based on the number of results
 
-chech out details and more [here](https://www.w3schools.com/sql/sql_top.asp)
+check out details and more [here](https://www.w3schools.com/sql/sql_top.asp)
 
 ## Joining Tables (Foreign Keys)
 

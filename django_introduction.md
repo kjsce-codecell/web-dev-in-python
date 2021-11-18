@@ -3,7 +3,15 @@
 ## Installation
 
 - Note: it is recommended that we use virtual environments
-- make sure you have `python3` or above and `pip` installed on your device
+- make sure you have `python3` or above and `pip` installed on your machine
+
+- vitual environment
+
+```bash
+virtualenv ./virt
+source ./virt/bin/activate
+```
+
 - install `Django` using pip
 
 ```bash
@@ -15,13 +23,13 @@ pip3 install Django
 ```bash
 django-admin startproject introduction     // create a number of starter files for our project
 cd introduction                            // navigate into your new project’s directory
-python3 manage.py runserver                 // run your server
+python manage.py runserver                 // run your server
 ```
 
 - Create app
 
 ```bash
-python3 manage.py startapp hello
+python manage.py startapp hello
 ```
 
 - Add `<APP_NAME>` to `INSTALLED_APPS` in `settings.py`

@@ -13,7 +13,7 @@ Here we’ll go through all the normal steps of creating a new app,
 ```bash
 django-admin startproject auth_app
 cd auth_app
-python3 manage.py startapp users
+python manage.py startapp users
 ```
 
 2. Add `users` in `INSTALLED_APPS`
@@ -21,7 +21,7 @@ python3 manage.py startapp users
 3. In `auth_app/urls.py`
 
 ```python
-path('', include('users.urls.py')),
+path('', include('users.urls')),
 ```
 
 4. In our new `urls.py` file, we’ll add a few more routes:
@@ -69,9 +69,9 @@ urlpatterns = [
 
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
-        <input type="text", name="username", placeholder="Username">
-        <input type="password", name="password", placeholder="Password">
-        <input type="submit", value="Login">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <input type="submit" value="Login">
     </form>
 {% endblock %}
 ```
@@ -100,8 +100,8 @@ def logout_view(request):
 Next, we can head to the admin site and add some users.
 
 ```bash
-python3 manage.py migrate
-python3 manage.py createsuperuser
+python manage.py migrate
+python manage.py createsuperuser
 ```
 
 After doing that, we’ll go back to `views.py` and update our `login_view` function to handle a `POST` request with a username and password:

@@ -12,8 +12,8 @@ python manage.py startapp flights
 
 Now we’ll have to go through the process of adding an app as usual:
 
-1. Add flights to the INSTALLED_APPS list in settings.py
-2. Add a route for flights in urls.py:
+1. Add flights to the `INSTALLED_APPS` list in `settings.py`
+2. Add a route for flights in `urls.py`:
 
 ```python
 path('flights/', include("flights.urls")),
@@ -28,7 +28,7 @@ from . import views
 urlpatterns = []
 ```
 
-Now instead of creating a `view` lets go to `models.py` and create a `Flight` model.
+Now before creating a `view` lets go to `models.py` and create a `Flight` model.
 
 ```python
 class Flight(models.Model):
@@ -396,6 +396,9 @@ path("<int:flight_id>/book", views.book, name="book")
 2. `views.py`
 
 ```python
+from django.http.response import HttpResponseRedirect
+from django.urls import reverse
+
 def book(request, flight_id):
 
     # For a post request, add a new flight
